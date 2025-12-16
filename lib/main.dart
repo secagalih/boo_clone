@@ -37,27 +37,42 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late SwipableStackController _controller;
+  late ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
     _controller = SwipableStackController();
+    _scrollController = ScrollController();
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
   void _handleLike(String profileId) {
     context.read<SwipeBloc>().add(LikeProfileEvent(profileId));
     _controller.next(swipeDirection: SwipeDirection.right, duration: const Duration(milliseconds: 300));
+    _scrollToTop();
   }
 
   void _handlePass(String profileId) {
     context.read<SwipeBloc>().add(PassProfileEvent(profileId));
     _controller.next(swipeDirection: SwipeDirection.left, duration: const Duration(milliseconds: 300));
+    _scrollToTop();
+  }
+
+  void _scrollToTop() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        0,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
   }
 
   @override
@@ -154,6 +169,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
             return SafeArea(
               child: SingleChildScrollView(
+                controller: _scrollController,
                 child: Column(
                   children: [
                     SizedBox(
